@@ -1,9 +1,6 @@
-import sys
-
 class BankingSystem:
     def __init__(self):
         # Nested dictionary simulating a relational database schema
-        # Schema: { account_number: { "name": str, "pin": str, "balance": float } }
         self.database = {
             "1001": {"name": "Syam Sandeep", "pin": "1234", "balance": 5000.0},
             "1002": {"name": "Rahul", "pin": "5678", "balance": 1500.0}
@@ -15,13 +12,12 @@ class BankingSystem:
         acc_num = input("Enter Account Number: ").strip()
         pin = input("Enter 4-Digit PIN: ").strip()
 
-        # Validation logic to prevent unauthorized access
         if acc_num in self.database and self.database[acc_num]["pin"] == pin:
             self.current_user = acc_num
             print(f"\n[SUCCESS] Authentication successful. Welcome, {self.database[acc_num]['name']}!")
             return True
         else:
-            print("\n[ERROR] Invalid Account Number or PIN access denied.")
+            print("\n[ERROR] Invalid Account Number or PIN. Access denied.")
             return False
 
     def check_balance(self):
@@ -35,19 +31,18 @@ class BankingSystem:
                 print("[ERROR] Deposit amount must be positive.")
                 return
             
-            # Update state integrity
             self.database[self.current_user]["balance"] += amount
             print(f"[SUCCESS] ${amount:,.2f} deposited successfully.")
             self.check_balance()
         except ValueError:
-            print("[ERROR] Invalid numeric input transaction cancelled.")
+            print("[ERROR] Invalid numeric input. Transaction cancelled.")
 
     def transfer_funds(self):
         print("\n--- SECURE INTER-BANK TRANSFER ---")
         target_acc = input("Enter Recipient Account Number: ").strip()
 
         if target_acc == self.current_user:
-            print("[ERROR] Cannot transfer funds to your own account system loop blocked.")
+            print("[ERROR] Cannot transfer funds to your own account.")
             return
 
         if target_acc not in self.database:
@@ -60,18 +55,16 @@ class BankingSystem:
                 print("[ERROR] Transfer amount must be positive.")
                 return
 
-            # Conditional safety gate check to prevent overdraft anomalies
             current_balance = self.database[self.current_user]["balance"]
             if amount > current_balance:
                 print(f"[DENIED] Insufficient funds. Overdraft prevented. Maximum available: ${current_balance:,.2f}")
                 return
 
-            # Atomic transaction block executing state updates across nodes
             self.database[self.current_user]["balance"] -= amount
             self.database[target_acc]["balance"] += amount
             print(f"\n[SUCCESS] Transaction Complete! ${amount:,.2f} routed securely to {self.database[target_acc]['name']}.")
         except ValueError:
-            print("[ERROR] Invalid numeric input transaction cancelled.")
+            print("[ERROR] Invalid numeric input. Transaction cancelled.")
 
     def logout(self):
         print(f"\nSession closed securely for user node: {self.current_user}")
@@ -91,7 +84,6 @@ def main():
         
         if choice == "1":
             if bank.authenticate_user():
-                # Post-authentication multi-tier system dashboard
                 while bank.current_user is not None:
                     print("\n--- USER CORE OPERATION PANEL ---")
                     print("1. Query Available Balance")
@@ -113,7 +105,7 @@ def main():
                         print("[ERROR] Invalid terminal instruction selection.")
         elif choice == "2":
             print("\nShutting down core database application loops cleanly. Goodbye!")
-            sys.exit()
+            break  # Replaced sys.exit() with break for online compatibility
         else:
             print("[ERROR] System command unrecognized.")
 
